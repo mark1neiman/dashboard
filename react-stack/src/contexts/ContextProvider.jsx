@@ -9,13 +9,12 @@ const StateContext = createContext({
 });
 
 export const ContextProvider = ({ children }) => {
-    const [user, setUser] = useState({
-        name: "Mark"
-    });
-    const [token, setToken] = useState(null)
-    // const [token, setToken] = useState(localStorage.getItem('ACCESS_TOKEN'))
-    const _setToken = (token) => {
-        setToken(token)
+    const [user, setUser] = useState({});
+    // const [token, _setToken] = useState(null)
+    const [token, _setToken] = useState(localStorage.getItem('ACCESS_TOKEN'))
+
+    const setToken = (token) => {
+        _setToken(token)
         if (token) {
             localStorage.setItem('ACCESS_TOKEN', token);
         } else {
@@ -28,7 +27,7 @@ export const ContextProvider = ({ children }) => {
             user,
             token,
             setUser,
-            _setToken
+            setToken,
         }}>
             {children}
         </StateContext.Provider>
