@@ -1,5 +1,7 @@
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider';
+import axiosClient from '../axios-client';
 
 
 const Signup = () => {
@@ -10,6 +12,7 @@ const Signup = () => {
     const passwordConfirmationRef = useRef();
 
     const { setUser, setToken } = useStateContext()
+    const [errors, setErrors] = useState(null)
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -19,16 +22,16 @@ const Signup = () => {
             password: passwordRef.current.value,
             password_confirmation: passwordConfirmationRef.current.value,
         }
-        // console.log(payload)
-        axiosClient.post(`/signup`, payload)
-            .then((data) => {
-                setToken(data.token)
+        console.log(payload)
+        axiosClient.post('/signup', payload)
+            .then(({ data }) => {
                 setUser(data.user)
+                setToken(data.token);
             })
             .catch(err => {
                 const response = err.response;
                 if (response && response.status === 422) {
-                    console.log(respose.data.errors)
+                    setErrors(response.data.errors)
                 }
             })
     }
@@ -38,6 +41,13 @@ const Signup = () => {
             <div className='form'>
                 <form onSubmit={onSubmit}>
                     <h1 className='title'>Signup right here right now!</h1>
+                    {errors &&
+                        <div className="alert">
+                            {Object.keys(errors).map(key => (
+                                <p key={key}>{errors[key][0]}</p>
+                            ))}
+                        </div>
+                    }
                     <input ref={nameRef} placeholder='Full Name' />
                     <input ref={emailRef} placeholder='Email' type="email" />
                     <input ref={passwordRef} placeholder='Password' type="password" />
